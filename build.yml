@@ -1,13 +1,6 @@
 version: 0.2
 
 phases:
-  install:
-    runtime-versions:
-      docker: 18
-    commands:
-      - echo Installing Trivy for vulnerability scanning...
-      - curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh
-      - mv trivy /usr/local/bin/
   pre_build:
     commands:
       - echo Logging in to Amazon ECR...
@@ -17,14 +10,12 @@ phases:
       - echo Building the Docker image...
       - docker build -t flask-app .
       - docker tag flask-app:latest 688567283850.dkr.ecr.us-east-1.amazonaws.com/assignment3-repo:latest
-      - echo Scanning the Docker image using Trivy...
-      - trivy image --exit-code 0 --severity HIGH,CRITICAL 688567283850.dkr.ecr.us-east-1.amazonaws.com/assignment3-repo:latest
   post_build:
     commands:
       - echo Pushing the Docker image to Amazon ECR...
       - docker push 688567283850.dkr.ecr.us-east-1.amazonaws.com/assignment3-repo:latest
       - echo Writing imagedefinitions.json...
-      - printf '[{"
+      - printf '[{"name":"flask-app","imageUri":"%s"}]' 688567283850.dkr.ecr.us-east-1.amazonaws.com/assignment3-repo:latest > imagedefinitions.json
 
 artifacts:
   files:
