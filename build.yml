@@ -10,21 +10,21 @@ phases:
       - mv trivy /usr/local/bin/
   pre_build:
     commands:
-      - echo Logging into Amazon ECR...
+      - echo Logging in to Amazon ECR...
       - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 688567283850.dkr.ecr.us-east-1.amazonaws.com
   build:
     commands:
       - echo Building the Docker image...
-      - docker build -t kulwinder-app .
-      - docker tag kulwinder-app:latest 688567283850.dkr.ecr.us-east-1.amazonaws.com/kulwinder-app:latest
-      - echo Scanning the image using Trivy...
-      - trivy image --exit-code 0 --severity HIGH,CRITICAL 688567283850.dkr.ecr.us-east-1.amazonaws.com/kulwinder-app:latest
+      - docker build -t flask-app .
+      - docker tag flask-app:latest 688567283850.dkr.ecr.us-east-1.amazonaws.com/assignment3-repo:latest
+      - echo Scanning the Docker image using Trivy...
+      - trivy image --exit-code 0 --severity HIGH,CRITICAL 688567283850.dkr.ecr.us-east-1.amazonaws.com/assignment3-repo:latest
   post_build:
     commands:
-      - echo Pushing the Docker image to ECR...
-      - docker push 688567283850.dkr.ecr.us-east-1.amazonaws.com/kulwinder-app:latest
-      - echo Writing imagedefinitions.json for ECS deployment...
-      - printf '[{"name":"kulwinder-container","imageUri":"%s"}]' 688567283850.dkr.ecr.us-east-1.amazonaws.com/kulwinder-app:latest > imagedefinitions.json
+      - echo Pushing the Docker image to Amazon ECR...
+      - docker push 688567283850.dkr.ecr.us-east-1.amazonaws.com/assignment3-repo:latest
+      - echo Writing imagedefinitions.json...
+      - printf '[{"
 
 artifacts:
   files:
