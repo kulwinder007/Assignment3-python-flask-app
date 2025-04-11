@@ -3,28 +3,31 @@ version: 0.2
 phases:
   install:
     commands:
+      - echo "Starting Docker daemon..."
       - nohup /usr/local/bin/dockerd --host=unix:///var/run/docker.sock --host=tcp://127.0.0.1:2375 --storage-driver=overlay2 &
       - timeout 15 sh -c "until docker info; do echo .; sleep 1; done"
 
   pre_build:
     commands:
+      - echo "Setting environment variables..."
+      - export IMAGE_NAME="flask-app"
+      - export REPOSITORY_URI="public.ecr.aws/m2e9m1c3/assignment3-repo"
+      - export IMAGE_TAG=$(echo "$CODEBUILD_RESOLVED_SOURCE_VERSION" | cut -c 1-7)
       - echo "Logging in to Amazon ECR..."
-      - IMAGE_NAME=flask-app
-      - REPOSITORY_URI=public.ecr.aws/m2e9m1c3/assignment3-repo
-      - IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+      - echo "Image will be tagged as: $REPOSITORY_URI:$IMAGE_TAG"
 
   build:
     commands:
       - echo "Building the Docker image..."
-      - docker build -t $IMAGE_NAME .
-      - docker tag $IMAGE_NAME:latest $REPOSITORY_URI:$IMAGE_TAG
+      - docker build -t "$IMAGE_NAME" .
+      - docker tag "$IMAGE_NAME:latest" "$REPOSITORY_URI:$IMAGE_TAG"
 
   post_build:
     commands:
       - echo "Pushing the Docker image to Amazon ECR..."
-      - docker push $REPOSITORY_URI:$IMAGE_TAG
+      - docker push "$REPOSITORY_URI:$IMAGE_TAG"
       - echo "Generating imagedefinitions.json for ECS deployment..."
-      - printf '[{"name":"flask-app","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
+      - printf '[{"name":"flask-app","imageUri":"%s"}]' "$REPOSITORY_URI:$IMAGE_TAG" > imagedefinitions.json
 
 artifacts:
   files:
