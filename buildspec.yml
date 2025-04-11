@@ -15,15 +15,13 @@ phases:
       - export IMAGE_TAG=$(echo "$CODEBUILD_RESOLVED_SOURCE_VERSION" | cut -c 1-7)
       - echo "Logging in to Amazon Public ECR..."
       - aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws
-      - echo 'Image will be tagged as: $REPOSITORY_URI:$IMAGE_TAG'
-    
+      - echo "Image will be tagged as: $REPOSITORY_URI:$IMAGE_TAG"
 
   build:
     commands:
       - echo "Building the Docker image..."
       - docker build -t "$IMAGE_NAME" .
-      - >
-        docker tag "$IMAGE_NAME:latest" "$REPOSITORY_URI:$IMAGE_TAG"
+      - docker tag "$IMAGE_NAME:latest" "$REPOSITORY_URI:$IMAGE_TAG"
 
   post_build:
     commands:
