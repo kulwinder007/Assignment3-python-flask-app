@@ -10,7 +10,7 @@ phases:
     commands:
       - echo "Logging in to Amazon ECR..."
       - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 688567283850.dkr.ecr.us-east-1.amazonaws.com
-      - REPOSITORY_URI=688567283850.dkr.ecr.us-east-1.amazonaws.com/assignment3-repo
+      - REPOSITORY_URI=public.ecr.aws/m2e9m1c3/assignment3-repo
       - IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
 
   build:
