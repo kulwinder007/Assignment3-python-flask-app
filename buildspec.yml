@@ -13,8 +13,10 @@ phases:
       - export IMAGE_NAME="flask-app"
       - export REPOSITORY_URI="public.ecr.aws/m2e9m1c3/assignment3-repo"
       - export IMAGE_TAG=$(echo "$CODEBUILD_RESOLVED_SOURCE_VERSION" | cut -c 1-7)
-      - echo "Logging in to Amazon ECR..."
-      - echo "Image will be tagged as: $REPOSITORY_URI:$IMAGE_TAG"
+      - echo "Logging in to Amazon Public ECR..."
+      - aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws
+      - echo 'Image will be tagged as: $REPOSITORY_URI:$IMAGE_TAG'
+    
 
   build:
     commands:
