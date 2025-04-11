@@ -7,18 +7,17 @@ phases:
       - timeout 15 sh -c "until docker info; do echo .; sleep 1; done"
 
   pre_build:
-  commands:
-    - echo "Logging in to Amazon ECR..."
-    - IMAGE_NAME=flask-app
-    - REPOSITORY_URI=public.ecr.aws/m2e9m1c3/assignment3-repo
-    - IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
-
+    commands:
+      - echo "Logging in to Amazon ECR..."
+      - IMAGE_NAME=flask-app
+      - REPOSITORY_URI=public.ecr.aws/m2e9m1c3/assignment3-repo
+      - IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
 
   build:
     commands:
       - echo "Building the Docker image..."
-      - docker build -t flask-app .
-      - docker tag flask-app:latest $REPOSITORY_URI:$IMAGE_TAG
+      - docker build -t $IMAGE_NAME .
+      - docker tag $IMAGE_NAME:latest $REPOSITORY_URI:$IMAGE_TAG
 
   post_build:
     commands:
@@ -29,4 +28,4 @@ phases:
 
 artifacts:
   files:
-    - '**/*imagedefinitions.json
+    - imagedefinitions.json
